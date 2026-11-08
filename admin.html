@@ -6,48 +6,59 @@
 <title>Mission Board admin panel</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@600;800&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Yuji+Syuku&family=Shippori+Mincho+B1:wght@500;700;800&family=Zen+Kaku+Gothic+New:wght@500;700&display=swap">
 <link rel="icon" href="data:,">
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body data-page="admin">
 
-<header class="page-head">
-  <img class="page-head-art" src="img/art-night.webp" alt="">
-  <div class="page-head-shade" aria-hidden="true"></div>
+<svg class="grain-layer" aria-hidden="true" focusable="false">
+  <defs>
+    <filter id="grain" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="0.006 0.24" numOctaves="4" seed="7"></feTurbulence><feColorMatrix type="matrix" values="0 0 0 0 0.04  0 0 0 0 0.02  0 0 0 0 0.01  0 0 0 1.5 -0.48"></feColorMatrix></filter>
+    <filter id="washi" x="-4%" y="-4%" width="108%" height="108%"><feTurbulence type="fractalNoise" baseFrequency="0.07" numOctaves="3" seed="4" result="warp"></feTurbulence><feDisplacementMap in="SourceGraphic" in2="warp" scale="10" xChannelSelector="R" yChannelSelector="G" result="sheet"></feDisplacementMap><feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="3" seed="2" result="grit"></feTurbulence><feColorMatrix in="grit" type="matrix" values="0 0 0 0 0.42  0 0 0 0 0.31  0 0 0 0 0.18  0 0 0 0.9 -0.3" result="speck"></feColorMatrix><feComposite in="speck" in2="sheet" operator="in" result="speckIn"></feComposite><feMerge><feMergeNode in="sheet"></feMergeNode><feMergeNode in="speckIn"></feMergeNode></feMerge></filter>
+    <filter id="stamp" x="-10%" y="-10%" width="120%" height="120%"><feTurbulence type="fractalNoise" baseFrequency="0.05" numOctaves="2" seed="9" result="w"></feTurbulence><feDisplacementMap in="SourceGraphic" in2="w" scale="3" result="d"></feDisplacementMap><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="1" seed="5" result="n"></feTurbulence><feColorMatrix in="n" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 -2.4 1.85" result="m"></feColorMatrix><feComposite in="d" in2="m" operator="in"></feComposite></filter>
+    <filter id="brush" x="-10%" y="-40%" width="120%" height="180%"><feTurbulence type="fractalNoise" baseFrequency="0.09" numOctaves="2" seed="11" result="b"></feTurbulence><feDisplacementMap in="SourceGraphic" in2="b" scale="4"></feDisplacementMap></filter>
+    <symbol id="kunai" viewBox="0 0 28 96"><circle cx="14" cy="9" r="7" fill="none" stroke="#2c2c30" stroke-width="3"></circle><rect x="11" y="15" width="6" height="30" rx="1.5" fill="#3a2a22"></rect><path d="M11 19 L17 23 M11 25 L17 29 M11 31 L17 35 M11 37 L17 41" stroke="#8a6e4e" stroke-width="1.6"></path><rect x="9" y="44" width="10" height="3" rx="1" fill="#2c2c30"></rect><path d="M14 47 L22 60 L14 92 L6 60 Z" fill="#5a5c63"></path><path d="M14 47 L14 92 L6 60 Z" fill="#3c3e44"></path></symbol>
+  </defs>
+  <rect width="100%" height="100%" filter="url(#grain)"></rect>
+</svg>
+
+<header class="beam">
   <div class="wrap">
-    <nav class="nav">
-      <a href="index.html" aria-label="Severance home"><img class="logo" src="img/logo.png" alt="Severance"></a>
-      <div class="nav-user">
-        <span class="who"><strong id="user-name"></strong><span id="user-meta"></span></span>
-        <a href="board.html">Back to the board</a>
-      </div>
+    <a href="index.html" aria-label="Severance home"><img class="logo" src="img/logo.png" alt="Severance"></a>
+    <nav class="nav-user" aria-label="Account">
+      <span class="who"><strong id="user-name"></strong><span id="user-meta"></span></span>
+      <a class="btn btn-slip" href="board.html">Back to the board</a>
     </nav>
-    <div class="page-title">
-      <h1 class="serif">Admin panel</h1>
-      <p>Post missions, clear claims, and choose who can edit the board.</p>
-    </div>
   </div>
 </header>
 
 <main class="admin wrap">
 
+  <div class="sign-hang">
+    <div class="sign-ropes" aria-hidden="true"><span></span><span></span></div>
+    <div class="sign woodgrain">
+      <h1><span class="kanji" aria-hidden="true">任務管理</span><span class="latin">ADMIN PANEL</span></h1>
+    </div>
+    <p class="counts">Post missions, clear claims, and see who can edit the board.</p>
+  </div>
+
   <section class="admin-section" aria-labelledby="post-title">
-    <h2 id="post-title" class="section-title">Post a mission</h2>
+    <h2 id="post-title" class="section-title"><span class="jp" aria-hidden="true">掲示</span>Post a mission</h2>
     <div class="split">
       <div class="split-main">
-        <div class="panel paste-box">
-          <label for="paste" class="strong">Paste from Discord</label>
-          <p class="small muted">Paste a mission in the usual format and the form fills itself in. You can fix anything after.</p>
+        <div class="paste-box paper">
+          <label for="paste">Paste from Discord</label>
+          <p class="hint">Paste a mission in the usual format and the form fills itself in. You can fix anything after.</p>
           <textarea id="paste" class="input" rows="9"></textarea>
           <div class="inline-actions">
-            <button id="fill" class="btn btn-light btn-small" type="button">Fill the form</button>
-            <button id="clear" class="btn btn-ghost btn-small" type="button">Clear</button>
+            <button id="fill" class="btn btn-ink btn-small" type="button">Fill the form</button>
+            <button id="clear" class="btn btn-ink btn-small" type="button">Clear</button>
           </div>
           <p id="paste-msg" class="msg error" role="alert" hidden></p>
         </div>
 
-        <form id="post-form" class="post-form" novalidate>
+        <form id="post-form" class="post-form paper" novalidate>
           <div class="form-grid">
             <div class="field wide"><label for="f-title">Title</label><input id="f-title" name="title" class="input" type="text" placeholder="Business Trip" autocomplete="off"></div>
             <div class="field wide"><label for="f-host">Host</label><input id="f-host" name="host" class="input" type="text" placeholder="Lore team member hosting it" autocomplete="off"></div>
@@ -67,16 +78,19 @@
           <div class="field"><label for="f-intel">Intel</label><textarea id="f-intel" name="intel" class="input" rows="3"></textarea></div>
           <div class="field"><label for="f-optional">Optional requirements</label><textarea id="f-optional" name="optionalRequirements" class="input" rows="2"></textarea></div>
           <div class="inline-actions">
-            <button class="btn btn-red" type="submit">Post to the board</button>
+            <button class="btn btn-seal" type="submit"><span class="seal" aria-hidden="true">掲</span>Post to the board</button>
             <p id="post-msg" class="msg" role="status" hidden></p>
           </div>
         </form>
       </div>
 
-      <aside class="split-side">
-        <div class="panel preview" aria-label="Preview">
-          <div class="preview-label">Preview</div>
-          <div id="preview"></div>
+      <aside class="split-side" aria-label="Preview">
+        <div class="preview-wrap">
+          <svg class="kunai" viewBox="0 0 28 96" aria-hidden="true" focusable="false"><use href="#kunai"></use></svg>
+          <div class="paper sheet sheet-compact">
+            <div class="preview-label">PREVIEW</div>
+            <div id="preview" class="sheet-flow is-open"></div>
+          </div>
         </div>
       </aside>
     </div>
@@ -84,36 +98,45 @@
 
   <section class="admin-section" aria-labelledby="posted-title">
     <div class="section-head">
-      <h2 id="posted-title" class="section-title">Posted missions</h2>
-      <span class="small muted">Clearing claims frees the mission for other squads.</span>
+      <h2 id="posted-title" class="section-title"><span class="jp" aria-hidden="true">一覧</span>Posted missions</h2>
+      <span class="section-note">Clearing claims frees the mission for other squads.</span>
     </div>
-    <div class="panel table-wrap">
-      <div class="table">
-        <div class="table-row table-head"><span>Mission</span><span>Host</span><span>Rank</span><span>Squads</span><span>Status</span><span class="right">Actions</span></div>
-        <div id="posted-rows"></div>
-      </div>
-    </div>
-  </section>
-
-  <section class="admin-section" aria-labelledby="lore-title">
-    <h2 id="lore-title" class="section-title">Lore team</h2>
-    <div class="split">
-      <div class="panel split-wide"><ul id="lore-list" class="admin-list"></ul></div>
-      <div class="split-side">
-        <div class="panel card-form">
-          <strong>Who can post</strong>
-          <p class="small muted">This list comes from the Lore Team tab in the squad sheet. Everyone marked Active there can post missions, clear claims and remove missions. To add or remove someone, change the sheet.</p>
+    <div class="ledger paper">
+      <div class="table-wrap">
+        <div class="table">
+          <div class="table-row table-head"><span>MISSION</span><span>HOST</span><span>RANK</span><span>SQUADS</span><span>STATUS</span><span class="right">ACTIONS</span></div>
+          <div id="posted-rows"></div>
         </div>
       </div>
     </div>
   </section>
 
-  <p id="demo-row" class="demo-row" hidden>
+  <section class="admin-section" aria-labelledby="lore-title">
+    <h2 id="lore-title" class="section-title"><span class="jp" aria-hidden="true">伝承班</span>Lore team</h2>
+    <div class="split">
+      <div class="split-wide paper"><ul id="lore-list" class="admin-list"></ul></div>
+      <div class="split-side">
+        <div class="card-form paper">
+          <strong>Who can post</strong>
+          <p>This list comes from the Lore Team tab in the squad sheet. Everyone marked Active there can post missions, clear claims and remove missions. To add or remove someone, change the sheet.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <p id="demo-row" class="demo-row on-wood" hidden>
     <span>Demo mode: everything here is saved in this browser only.</span>
     <button id="demo-reset" class="link-btn" type="button">Reset demo data</button>
   </p>
 
 </main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <img src="img/logo.png" alt="Severance">
+    <span>Mission Board</span>
+  </div>
+</footer>
 
 <script src="js/api.js"></script>
 <script src="js/app.js"></script>

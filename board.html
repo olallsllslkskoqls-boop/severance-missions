@@ -6,53 +6,85 @@
 <title>Mission Board</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@600;800&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Yuji+Syuku&family=Shippori+Mincho+B1:wght@500;700;800&family=Zen+Kaku+Gothic+New:wght@500;700&display=swap">
 <link rel="icon" href="data:,">
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body data-page="board">
 
-<header class="page-head">
-  <img class="page-head-art" src="img/art-moon.webp" alt="">
-  <div class="page-head-shade" aria-hidden="true"></div>
+<svg class="grain-layer" aria-hidden="true" focusable="false">
+  <defs>
+    <filter id="grain" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="0.006 0.24" numOctaves="4" seed="7"></feTurbulence><feColorMatrix type="matrix" values="0 0 0 0 0.04  0 0 0 0 0.02  0 0 0 0 0.01  0 0 0 1.5 -0.48"></feColorMatrix></filter>
+    <filter id="washi" x="-4%" y="-4%" width="108%" height="108%"><feTurbulence type="fractalNoise" baseFrequency="0.07" numOctaves="3" seed="4" result="warp"></feTurbulence><feDisplacementMap in="SourceGraphic" in2="warp" scale="10" xChannelSelector="R" yChannelSelector="G" result="sheet"></feDisplacementMap><feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="3" seed="2" result="grit"></feTurbulence><feColorMatrix in="grit" type="matrix" values="0 0 0 0 0.42  0 0 0 0 0.31  0 0 0 0 0.18  0 0 0 0.9 -0.3" result="speck"></feColorMatrix><feComposite in="speck" in2="sheet" operator="in" result="speckIn"></feComposite><feMerge><feMergeNode in="sheet"></feMergeNode><feMergeNode in="speckIn"></feMergeNode></feMerge></filter>
+    <filter id="stamp" x="-10%" y="-10%" width="120%" height="120%"><feTurbulence type="fractalNoise" baseFrequency="0.05" numOctaves="2" seed="9" result="w"></feTurbulence><feDisplacementMap in="SourceGraphic" in2="w" scale="3" result="d"></feDisplacementMap><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="1" seed="5" result="n"></feTurbulence><feColorMatrix in="n" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 -2.4 1.85" result="m"></feColorMatrix><feComposite in="d" in2="m" operator="in"></feComposite></filter>
+    <filter id="brush" x="-10%" y="-40%" width="120%" height="180%"><feTurbulence type="fractalNoise" baseFrequency="0.09" numOctaves="2" seed="11" result="b"></feTurbulence><feDisplacementMap in="SourceGraphic" in2="b" scale="4"></feDisplacementMap></filter>
+    <symbol id="kunai" viewBox="0 0 28 96"><circle cx="14" cy="9" r="7" fill="none" stroke="#2c2c30" stroke-width="3"></circle><rect x="11" y="15" width="6" height="30" rx="1.5" fill="#3a2a22"></rect><path d="M11 19 L17 23 M11 25 L17 29 M11 31 L17 35 M11 37 L17 41" stroke="#8a6e4e" stroke-width="1.6"></path><rect x="9" y="44" width="10" height="3" rx="1" fill="#2c2c30"></rect><path d="M14 47 L22 60 L14 92 L6 60 Z" fill="#5a5c63"></path><path d="M14 47 L14 92 L6 60 Z" fill="#3c3e44"></path></symbol>
+  </defs>
+  <rect width="100%" height="100%" filter="url(#grain)"></rect>
+</svg>
+
+<header class="beam">
   <div class="wrap">
-    <nav class="nav">
-      <a href="index.html" aria-label="Severance home"><img class="logo" src="img/logo.png" alt="Severance"></a>
-      <div class="nav-user">
-        <span class="who"><strong id="user-name"></strong><span id="user-meta"></span></span>
-        <a id="admin-link" href="admin.html" hidden>Admin panel</a>
-        <button id="sign-out" class="link-btn" type="button">Sign out</button>
-      </div>
+    <a href="index.html" aria-label="Severance home"><img class="logo" src="img/logo.png" alt="Severance"></a>
+    <nav class="nav-user" aria-label="Account">
+      <span class="who"><strong id="user-name"></strong><span id="user-meta"></span></span>
+      <a id="admin-link" class="btn btn-slip" href="admin.html" hidden>Admin panel</a>
+      <button id="sign-out" class="btn btn-slip alt" type="button">Sign out</button>
     </nav>
-    <div class="page-title">
-      <h1 class="serif">Mission Board</h1>
-      <p id="board-counts">Shinobi faction</p>
-    </div>
   </div>
 </header>
 
 <main class="board wrap">
-  <aside class="board-side">
-    <section class="panel squad-box" aria-labelledby="squad-title">
-      <div class="row">
-        <h2 id="squad-title" class="serif"></h2>
-        <span id="squad-slot" class="slot"></span>
-      </div>
-      <p id="squad-line"></p>
-    </section>
-
-    <div class="tabs" role="group" aria-label="Filter missions">
-      <button class="tab" type="button" data-filter="all" aria-pressed="true">All</button>
-      <button class="tab" type="button" data-filter="open" aria-pressed="false">Not claimed</button>
-      <button class="tab" type="button" data-filter="claimed" aria-pressed="false">Claimed</button>
+  <div class="sign-hang">
+    <div class="sign-ropes" aria-hidden="true"><span></span><span></span></div>
+    <div class="sign woodgrain">
+      <h1><span class="kanji" aria-hidden="true">任務掲示板</span><span class="latin">MISSION BOARD</span></h1>
     </div>
+    <p id="board-counts" class="counts">Shinobi faction</p>
+  </div>
 
-    <ul id="mission-list" class="mission-list"></ul>
-    <p id="list-empty" class="empty" hidden>Nothing here right now.</p>
-  </aside>
+  <div class="board-row">
+    <aside class="board-side">
+      <section class="ema-wrap" aria-labelledby="squad-title">
+        <div class="ema woodgrain">
+          <span id="squad-kanji" class="ema-kanji" aria-hidden="true"></span>
+          <h2 id="squad-title"></h2>
+          <span class="rule" aria-hidden="true"></span>
+          <span id="squad-slot" class="slot"></span>
+          <p id="squad-line"></p>
+        </div>
+      </section>
 
-  <article id="mission" class="panel mission" aria-live="polite"></article>
+      <div class="tags">
+        <span class="tags-label">SHOW</span>
+        <div class="tags-rail" aria-hidden="true"></div>
+        <div class="tabs" role="group" aria-label="Filter missions">
+          <button class="tab" type="button" data-filter="all" aria-pressed="true"><span class="jp" aria-hidden="true">全</span><span class="en">All</span></button>
+          <button class="tab" type="button" data-filter="open" aria-pressed="false"><span class="jp" aria-hidden="true">募集</span><span class="en">Open</span></button>
+          <button class="tab" type="button" data-filter="claimed" aria-pressed="false"><span class="jp" aria-hidden="true">受諾</span><span class="en">Claimed</span></button>
+        </div>
+      </div>
+    </aside>
+
+    <section class="board-wall" aria-label="Missions">
+      <ul id="mission-list" class="notices"></ul>
+      <p id="list-empty" class="empty" hidden>Nothing pinned here right now.</p>
+    </section>
+  </div>
+
+  <div id="sheet-wrap" class="sheet-wrap">
+    <svg class="kunai left" viewBox="0 0 28 96" aria-hidden="true" focusable="false"><use href="#kunai"></use></svg>
+    <svg class="kunai right" viewBox="0 0 28 96" aria-hidden="true" focusable="false"><use href="#kunai"></use></svg>
+    <article id="mission" class="paper sheet sheet-flow" aria-live="polite"></article>
+  </div>
 </main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <img src="img/logo.png" alt="Severance">
+    <span>Mission Board</span>
+  </div>
+</footer>
 
 <script src="js/api.js"></script>
 <script src="js/app.js"></script>

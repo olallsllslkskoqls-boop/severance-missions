@@ -35,14 +35,44 @@
     }
   };
 
+  const svgNS = 'http://www.w3.org/2000/svg';
+  const svg = (tag, attrs, ...kids) => {
+    const node = document.createElementNS(svgNS, tag);
+    Object.entries(attrs || {}).forEach(([key, value]) => node.setAttribute(key, value));
+    kids.forEach((kid) => node.append(kid));
+    return node;
+  };
+  const kunai = (cls = '') => svg('svg', { class: `kunai ${cls}`.trim(), viewBox: '0 0 28 96', 'aria-hidden': 'true', focusable: 'false' }, svg('use', { href: '#kunai' }));
+
+  const kanjiDigits = ['〇', '一', '二', '三', '四', '五', '六', '七', '八', '九'];
+  const kanjiNum = (n) => {
+    if (!Number.isInteger(n) || n < 1 || n > 99) return String(n);
+    const tens = Math.floor(n / 10);
+    const ones = n % 10;
+    return `${tens > 1 ? kanjiDigits[tens] : ''}${tens ? '十' : ''}${ones ? kanjiDigits[ones] : ''}`;
+  };
+  const squadKanji = (n) => `第${kanjiNum(n)}班`;
+
+  const rankParts = (rank) => {
+    const text = String(rank ?? '').trim();
+    return { letter: text.charAt(0).toUpperCase(), mod: text.slice(1) };
+  };
+  const enso = (rank) => {
+    const { letter, mod } = rankParts(rank);
+    return el('span', { class: 'enso', 'aria-hidden': 'true' },
+      svg('svg', { viewBox: '0 0 66 66' }, svg('circle', { cx: '33', cy: '33', r: '27' })),
+      el('span', { text: letter || '?' }),
+      mod ? el('small', { text: mod }) : null);
+  };
+
   const whoLine = (me) => (me.squad ? `Squad ${me.squad}` : (me.loreRank || 'Lore team'));
 
   const statusOf = (mission, squad) => {
     const count = mission.claims.length;
-    if (squad != null && mission.claims.includes(squad)) return { text: 'YOUR SQUAD’S MISSION', cls: 'status-mine' };
-    if (count >= mission.squadsNeeded) return { text: 'CLAIMED', cls: 'status-claimed' };
-    if (count > 0) return { text: `${count} OF ${mission.squadsNeeded} SQUADS`, cls: 'status-partial' };
-    return { text: 'NOT CLAIMED', cls: 'status-open' };
+    if (squad != null && mission.claims.includes(squad)) return { text: 'YOUR SQUAD', cls: 'is-mine', jp: squadKanji(squad) };
+    if (count >= mission.squadsNeeded) return { text: 'CLAIMED', cls: 'is-claimed', jp: '受諾済' };
+    if (count > 0) return { text: `${count} OF ${mission.squadsNeeded} SQUADS`, cls: 'is-partial', jp: '募集中' };
+    return { text: 'OPEN', cls: 'is-open', jp: '募集中' };
   };
 
   const isFull = (mission) => mission.claims.length >= mission.squadsNeeded;
@@ -50,49 +80,53 @@
 
   const missionDetail = (mission, { squad = null, action = null, preview = false } = {}) => {
     const clean = (value) => String(value ?? '').trim();
-    const fact = (label, value) => el('div', null,
-      el('dt', { text: label }),
+    const fact = (jp, label, value) => el('div', null,
+      el('dt', null, el('span', { class: 'jp', 'aria-hidden': 'true', text: jp }), el('span', { class: 'en', text: label })),
       clean(value) ? el('dd', { text: clean(value) }) : el('dd', { class: 'unset', text: 'Not set' }));
     const para = (value) => (clean(value) ? el('p', { text: clean(value) }) : el('p', { class: 'unset', text: 'Not set' }));
-    const section = (heading, content) => el('section', null, el('h3', { text: heading }), content);
+    const section = (jp, heading, content) => el('section', { class: 'sheet-section' },
+      el('h3', null, el('span', { class: 'jp', 'aria-hidden': 'true', text: jp }), heading),
+      content);
     const status = statusOf(mission, squad);
     const count = mission.claims.length;
     const title = clean(mission.title);
     const host = clean(mission.host);
+    const { letter } = rankParts(mission.rank);
     const objectives = (mission.objectives || []).map(clean).filter(Boolean);
     const claimedLine = count
       ? `On it: ${mission.claims.map((s) => `Squad ${s}`).join(', ')} (${count} of ${mission.squadsNeeded})`
       : `No squads yet (0 of ${mission.squadsNeeded})`;
 
     return [
-      el('div', { class: 'mission-head' },
-        el('div', { class: 'row' },
-          el('span', { class: `status tag ${status.cls}`, text: status.text }),
+      el('div', { class: 'sheet-main' },
+        el('div', { class: 'sheet-status' },
+          el('span', { class: 'chip', text: status.text }),
           preview ? null : el('span', { class: 'claimed-line', text: claimedLine })),
         el('div', { class: 'title-block' },
-          el('h2', { class: title ? 'serif' : 'serif unset', text: title ? `“${title}”` : 'Untitled mission' }),
+          el('h2', { class: title ? null : 'unset', text: title || 'Untitled mission' }),
           el('p', { class: 'host-line' }, 'Host: ', host ? el('strong', { text: host }) : el('strong', { class: 'unset', text: 'Not set' }))),
-        action),
-      el('dl', { class: 'facts' },
-        fact('Rank', mission.rank),
-        fact('Faction', mission.faction),
-        fact('Squads needed', mission.squadsNeeded),
-        fact('Squad member limit', mission.memberLimit)),
-      el('dl', { class: 'facts' },
-        fact('Pay per squad member', mission.pay),
-        fact('Bonus', mission.bonus),
-        fact('Failure', mission.failure)),
-      el('dl', { class: 'facts' },
-        fact('Location', mission.location),
-        fact('Departure', mission.departure),
-        fact('Time limit', mission.timeLimit)),
-      el('div', { class: 'mission-body' },
-        section('Brief summary', para(mission.summary)),
-        section('Objectives', objectives.length
-          ? el('ol', null, objectives.map((o) => el('li', { text: o })))
+        action,
+        section('概要', 'Brief summary', para(mission.summary)),
+        section('目標', 'Objectives', objectives.length
+          ? el('ol', { class: 'objectives' }, objectives.map((o, i) => el('li', null,
+            el('span', { class: 'num', 'aria-hidden': 'true', text: kanjiNum(i + 1) }),
+            el('span', { text: o }))))
           : el('p', { class: 'unset', text: 'Not set' })),
-        section('Intel', para(mission.intel)),
-        section('Optional requirements', para(mission.optionalRequirements)))
+        section('情報', 'Intel', para(mission.intel)),
+        section('任意', 'Optional requirements', para(mission.optionalRequirements))),
+      el('div', { class: 'sheet-side' },
+        el('dl', { class: 'facts' },
+          fact('級', 'Rank', mission.rank),
+          fact('所属', 'Faction', mission.faction),
+          fact('班数', 'Squads needed', mission.squadsNeeded),
+          fact('人数', 'Member limit', mission.memberLimit),
+          fact('報酬', 'Pay per member', mission.pay),
+          fact('賞与', 'Bonus', mission.bonus),
+          fact('失敗', 'Failure', mission.failure),
+          fact('場所', 'Location', mission.location),
+          fact('出発', 'Departure', mission.departure),
+          fact('期限', 'Time limit', mission.timeLimit)),
+        el('span', { class: 'sheet-vertical', 'aria-hidden': 'true', text: letter ? `任務指令書 · ${letter}級` : '任務指令書' }))
     ];
   };
 
@@ -185,13 +219,11 @@
       $('#done-meta').textContent = `${whoLine(session)} · @${session.roblox}`;
       topAction.textContent = 'Open the board';
       topAction.href = 'board.html';
-      topAction.className = 'btn btn-red btn-small';
       showStep('done');
     };
     const showSignedOut = () => {
       topAction.textContent = 'Verify';
       topAction.href = '#verify';
-      topAction.className = 'btn btn-ghost btn-small';
       showStep('name');
     };
 
@@ -284,6 +316,8 @@
 
     const list = $('#mission-list');
     const detail = $('#mission');
+    const sheetWrap = $('#sheet-wrap');
+    const calm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     let me = api.getSession();
     let missions = [];
     let filter = 'all';
@@ -327,7 +361,8 @@
       actionError = '';
       history.replaceState(null, '', `#${encodeURIComponent(id)}`);
       render();
-      if (window.innerWidth < 960) detail.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      const top = sheetWrap.getBoundingClientRect().top;
+      if (top < 0 || top > window.innerHeight * 0.6) sheetWrap.scrollIntoView({ behavior: calm ? 'auto' : 'smooth', block: 'start' });
     };
 
     const actionFor = (mission, mine) => {
@@ -338,7 +373,7 @@
         box.append(note('The lore team posts missions but doesn’t claim them.'));
       } else if (mission.claims.includes(squad)) {
         box.append(
-          el('button', { class: 'btn btn-ghost', type: 'button', text: 'Drop mission', onClick: (e) => run(e.currentTarget, () => api.drop(mission.id)) }),
+          el('button', { class: 'btn btn-ink', type: 'button', text: 'Drop mission', onClick: (e) => run(e.currentTarget, () => api.drop(mission.id)) }),
           note(`Squad ${squad} is on this one. Dropping frees the slot for another squad.`));
       } else if (isFull(mission)) {
         box.append(
@@ -351,7 +386,9 @@
       } else {
         const left = mission.squadsNeeded - mission.claims.length;
         box.append(
-          el('button', { class: 'btn btn-red', type: 'button', text: `Claim for Squad ${squad}`, onClick: (e) => run(e.currentTarget, () => api.claim(mission.id)) }),
+          el('button', { class: 'btn btn-seal', type: 'button', onClick: (e) => run(e.currentTarget, () => api.claim(mission.id)) },
+            el('span', { class: 'seal', 'aria-hidden': 'true', text: '受' }),
+            `Claim for Squad ${squad}`),
           note(mission.squadsNeeded > 1 ? `${left} of ${mission.squadsNeeded} squad slots left.` : 'Takes 1 squad.'));
       }
       if (actionError) box.append(el('p', { class: 'msg error', role: 'alert', text: actionError }));
@@ -364,44 +401,67 @@
       const mine = squad ? missions.find((m) => m.claims.includes(squad)) || null : null;
       const open = missions.filter((m) => !isFull(m)).length;
       const counts = { all: missions.length, open, claimed: missions.length - open };
-      const labels = { all: 'All', open: 'Not claimed', claimed: 'Claimed' };
+      const labels = { all: 'All', open: 'Open', claimed: 'Claimed' };
 
       $('#board-counts').textContent = `Shinobi faction · ${open} open · ${counts.claimed} claimed`;
-      $('#squad-title').textContent = squad ? `Squad ${squad}` : 'Lore team';
-      $('#squad-slot').textContent = squad ? (mine ? '1 / 1 mission' : '0 / 1 mission') : '';
+      $('#squad-kanji').textContent = squad ? squadKanji(squad) : '伝承';
+      $('#squad-title').textContent = squad ? `SQUAD ${squad}` : 'LORE TEAM';
+      $('#squad-slot').textContent = squad ? `Mission slot ${mine ? 1 : 0} / 1` : '';
       $('#squad-slot').classList.toggle('full', !!mine);
       $('#squad-line').textContent = squad
-        ? (mine ? `On “${mine.title}”.` : 'No mission yet. Anyone in the squad can claim one.')
+        ? (mine ? `On ${mine.title}.` : 'No mission yet. Anyone in the squad can claim one.')
         : 'You can read the board here. Post and manage missions from the admin panel.';
 
       $$('.tab').forEach((tab) => {
         const key = tab.dataset.filter;
-        tab.textContent = `${labels[key]} (${counts[key]})`;
+        $('.en', tab).textContent = `${labels[key]} ${counts[key]}`;
         tab.setAttribute('aria-pressed', String(key === filter));
       });
 
       if (!missions.some((m) => m.id === selected)) selected = missions[0] ? missions[0].id : null;
 
+      const line = (label, value) => el('span', null, el('span', { class: 'k', 'aria-hidden': 'true', text: label }), value || 'Not set');
       const shown = missions.filter((m) => filter === 'all' || (filter === 'open' ? !isFull(m) : isFull(m)));
       list.replaceChildren(...shown.map((m) => {
         const status = statusOf(m, squad);
-        return el('li', null,
-          el('button', { class: 'mission-item', type: 'button', 'aria-pressed': String(m.id === selected), onClick: () => select(m.id) },
-            el('span', { class: 'rank', 'aria-hidden': 'true', text: m.rank }),
-            el('span', { class: 'info' },
-              el('span', { class: 'title', text: `“${m.title}”` }),
-              el('span', { class: 'meta', text: `Host: ${m.host || 'Not set'}` }),
-              el('span', { class: 'meta', text: m.location }),
-              el('span', { class: 'meta', text: `${m.pay} per member · ${squadsText(m.squadsNeeded)}` }),
-              el('span', { class: `status ${status.cls}`, text: status.text }))));
+        const on = m.id === selected;
+        const stamped = status.cls === 'is-claimed' || status.cls === 'is-mine';
+        return el('li', { class: `notice ${status.cls}${on ? ' is-on' : ''}` },
+          el('button', { class: 'notice-card paper', type: 'button', 'aria-pressed': String(on), onClick: () => select(m.id) },
+            el('span', { class: 'strip', 'aria-hidden': 'true', text: status.jp }),
+            el('span', { class: 'notice-body' },
+              el('span', { class: 'notice-top' },
+                enso(m.rank),
+                el('span', { class: 'notice-kicker' },
+                  el('span', { text: `Rank ${m.rank || '?'} · ${m.faction || 'Shinobi'}` }),
+                  el('span', { class: 'status', text: status.text }))),
+              el('span', { class: 'notice-title', text: m.title || 'Untitled mission' }),
+              el('span', { class: 'brush-rule', 'aria-hidden': 'true' }),
+              el('span', { class: 'notice-lines' },
+                line('場所', m.location),
+                line('報酬', m.pay ? `${m.pay} per member` : ''),
+                line('班数', squadsText(m.squadsNeeded))),
+              el('span', { class: 'notice-foot' },
+                el('span', { text: 'Host' }),
+                el('span', { class: 'host-seal stamp' },
+                  el('span', { class: 'jp', 'aria-hidden': 'true', text: '担当' }),
+                  el('span', { class: 'name', text: m.host || 'Not set' })))),
+            stamped
+              ? el('span', { class: 'big-stamp', 'aria-hidden': 'true' },
+                el('span', { class: 'jp', text: '受諾' }),
+                el('span', { class: 'en', text: m.claims.map((s) => `SQUAD ${s}`).join(' · ') }))
+              : null),
+          kunai());
       }));
       $('#list-empty').hidden = shown.length > 0;
 
       const mission = missions.find((m) => m.id === selected);
       if (!mission) {
-        detail.replaceChildren(el('div', { class: 'mission-body' }, el('p', { class: 'muted', text: 'No missions are posted right now.' })));
+        detail.className = 'paper sheet sheet-flow';
+        detail.replaceChildren(el('p', { class: 'sheet-note', text: 'No missions are posted right now.' }));
         return;
       }
+      detail.className = `paper sheet sheet-flow ${statusOf(mission, squad).cls}`;
       detail.replaceChildren(...missionDetail(mission, { squad, action: actionFor(mission, mine) }));
     };
 
@@ -518,14 +578,14 @@
         const status = statusOf(m, null);
         const confirming = confirmId === m.id;
         return el('div', { class: 'table-row' },
-          el('span', { class: 'serif row-title', text: `“${m.title}”` }),
+          el('span', { class: 'row-title', text: m.title }),
           el('span', { text: m.host || 'Not set' }),
           el('span', { class: 'strong', text: m.rank }),
           el('span', { text: `${m.claims.length} of ${m.squadsNeeded}` }),
           el('span', { class: `status ${status.cls}`, text: status.text }),
           el('span', { class: 'actions' },
             el('button', {
-              class: 'btn btn-ghost btn-small',
+              class: 'btn btn-ink btn-small',
               type: 'button',
               disabled: !m.claims.length,
               text: 'Clear claims',
@@ -535,7 +595,7 @@
               }
             }),
             el('button', {
-              class: `btn btn-small ${confirming ? 'btn-danger' : 'btn-ghost'}`,
+              class: `btn btn-small ${confirming ? 'btn-danger' : 'btn-ink'}`,
               type: 'button',
               text: confirming ? 'Click again to remove' : 'Remove',
               onClick: async (e) => {
