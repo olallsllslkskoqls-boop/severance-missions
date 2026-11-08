@@ -1,0 +1,77 @@
+[
+  {
+    "id": "safe-passage",
+    "title": "Safe Passage",
+    "host": "hamdi421",
+    "rank": "D",
+    "faction": "Shinobi",
+    "squadsNeeded": 1,
+    "memberLimit": "9",
+    "pay": "90 Ryo",
+    "bonus": "N/A",
+    "failure": "No pay, reputation loss for the entire squad.",
+    "location": "Road between Kaigakure and the harbor",
+    "departure": "Kaigakure",
+    "timeLimit": "Tomorrow morning",
+    "summary": "A merchant paid a group of hired guards in advance to escort his cargo to the harbor, but they never showed up. He is visibly worried because his buyers expect the goods by tomorrow morning. Knowing he cannot afford to lose the deal, he has requested a shinobi squad to escort him and his cart safely to the harbor.",
+    "objectives": [
+      "Receive the mission information from your assigned Chuunin.",
+      "Escort the merchant and his cargo to the harbor before dawn.",
+      "Deal with any threats along the road, then return to Kaigakure to receive your payment."
+    ],
+    "intel": "Wild animals may be present.",
+    "optionalRequirements": "A sensory ninja to scout the road, a medic for any injuries.",
+    "claims": [
+      6
+    ]
+  },
+  {
+    "id": "business-trip",
+    "title": "Business Trip",
+    "host": "hamdi421",
+    "rank": "C-",
+    "faction": "Shinobi",
+    "squadsNeeded": 1,
+    "memberLimit": "9",
+    "pay": "220 Ryo",
+    "bonus": "???",
+    "failure": "40 Ryo, -1 reputation for the entire squad.",
+    "location": "Nagomi Island",
+    "departure": "Kaigakure",
+    "timeLimit": "N/A",
+    "summary": "A wealthy merchant left Kaigakure for Nagomi Island to buy and sell goods. He should have returned a week ago, but no word has reached his family since he left. His wife is worried sick and has requested a shinobi squad to find him and bring him home. She will cover the expenses.",
+    "objectives": [
+      "Receive the mission information from your assigned Chuunin.",
+      "Travel to Nagomi Island and find the merchant.",
+      "Bring him back to Kaigakure and report to his wife."
+    ],
+    "intel": "According to his wife, the merchant was supposed to be on Nagomi Island on business. Low bandit activity has been reported on the island, and wild animals may be present. The merchant's name is Kojima Takara. He has a moustache and a thin beard on his chin, he's also bald.",
+    "optionalRequirements": "A sensory ninja and a medic for any injuries.",
+    "claims": []
+  },
+  {
+    "id": "the-hydra",
+    "title": "The Hydra",
+    "host": "hamdi421",
+    "rank": "B-",
+    "faction": "Shinobi",
+    "squadsNeeded": 2,
+    "memberLimit": "8 per squad",
+    "pay": "400 Ryo",
+    "bonus": "???",
+    "failure": "No pay, reputation loss for both squads.",
+    "location": "Western Wilderness",
+    "departure": "Kaigakure",
+    "timeLimit": "N/A",
+    "summary": "The locals of the Western Wilderness have reported a growing number of bandits in their area. Merchants are being robbed on the roads, boats are being stolen, and many villagers are afraid to leave their homes after dark. Two shinobi squads have been requested to deal with the bandits and put an end to the threat.",
+    "objectives": [
+      "Receive the mission information from your assigned Chuunin.",
+      "Travel to the Western Wilderness, if you find any locals, try to get extra information.",
+      "Find the bandits and deal with them.",
+      "Return to Kaigakure to receive your payment."
+    ],
+    "intel": "According to the locals, the bandits operate in large groups and have a base somewhere in the Western Wilderness.",
+    "optionalRequirements": "A sensory ninja and medics.",
+    "claims": []
+  }
+]

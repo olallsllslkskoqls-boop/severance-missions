@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mission Board</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@600;800&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap">
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body data-page="board">
+
+<header class="page-head">
+  <img class="page-head-art" src="img/art-moon.webp" alt="">
+  <div class="page-head-shade" aria-hidden="true"></div>
+  <div class="wrap">
+    <nav class="nav">
+      <a href="index.html" aria-label="Severance home"><img class="logo" src="img/logo.png" alt="Severance"></a>
+      <div class="nav-user">
+        <span class="who"><strong id="user-name"></strong><span id="user-meta"></span></span>
+        <a id="admin-link" href="admin.html" hidden>Admin panel</a>
+        <button id="sign-out" class="link-btn" type="button">Sign out</button>
+      </div>
+    </nav>
+    <div class="page-title">
+      <h1 class="serif">Mission Board</h1>
+      <p id="board-counts">Shinobi faction</p>
+    </div>
+  </div>
+</header>
+
+<main class="board wrap">
+  <aside class="board-side">
+    <section class="panel squad-box" aria-labelledby="squad-title">
+      <div class="row">
+        <h2 id="squad-title" class="serif"></h2>
+        <span id="squad-slot" class="slot"></span>
+      </div>
+      <p id="squad-line"></p>
+    </section>
+
+    <div class="tabs" role="group" aria-label="Filter missions">
+      <button class="tab" type="button" data-filter="all" aria-pressed="true">All</button>
+      <button class="tab" type="button" data-filter="open" aria-pressed="false">Not claimed</button>
+      <button class="tab" type="button" data-filter="claimed" aria-pressed="false">Claimed</button>
+    </div>
+
+    <ul id="mission-list" class="mission-list"></ul>
+    <p id="list-empty" class="empty" hidden>Nothing here right now.</p>
+  </aside>
+
+  <article id="mission" class="panel mission" aria-live="polite"></article>
+</main>
+
+<script src="js/api.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

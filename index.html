@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Severance · Mission Board</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@600;800&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap">
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body data-page="landing">
+
+<section class="hero">
+  <img class="hero-art on" src="img/art-kneel.webp" alt="">
+  <img class="hero-art" src="img/art-moon.webp" alt="">
+  <img class="hero-art" src="img/art-night.webp" alt="">
+  <img class="hero-art" src="img/art-sun.webp" alt="">
+  <div class="hero-shade" aria-hidden="true"></div>
+  <div class="hero-fade" aria-hidden="true"></div>
+
+  <header class="topbar wrap">
+    <img class="logo" src="img/logo.png" alt="Severance">
+    <a id="top-action" class="btn btn-ghost btn-small" href="#verify">Verify</a>
+  </header>
+
+  <div class="hero-body wrap">
+    <div class="hero-copy">
+      <img class="hero-logo" src="img/logo.png" alt="Severance">
+      <h1 class="serif">Mission Board</h1>
+      <p class="lead">The mission board for Kaigakure's shinobi squads. Prove which character you play, then claim work for your squad.</p>
+      <p class="lock-note">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"></rect><path d="M8 11V7a4 4 0 0 1 8 0v4"></path></svg>
+        The board stays hidden until you verify.
+      </p>
+    </div>
+
+    <div id="verify" class="verify-card">
+      <div id="step-name" class="verify-step">
+        <div class="step-head">
+          <span class="step">Step 1 of 2</span>
+          <h2 class="serif">Verify your character</h2>
+        </div>
+        <form id="name-form" class="verify-form" novalidate>
+          <div class="field">
+            <label for="roblox-name">Roblox username</label>
+            <input id="roblox-name" class="input" type="text" placeholder="Your Roblox username" autocomplete="off" autocapitalize="off" spellcheck="false">
+          </div>
+          <div class="field">
+            <label for="lore-name">Lore name</label>
+            <input id="lore-name" class="input" type="text" placeholder="Your character's full name" autocomplete="off">
+            <span class="small muted">Lore team: leave this empty.</span>
+          </div>
+          <p id="name-error" class="msg error" role="alert" hidden></p>
+          <button class="btn btn-red" type="submit">Send a code to my screen</button>
+        </form>
+        <p class="small muted">Be in a Nami Region server on that account, playing that character. The code pops up on your screen there.</p>
+        <div id="demo-names" class="demo-names" hidden>
+          <span>Demo names:</span>
+          <button class="link-btn" type="button" data-roblox="renn_tk" data-name="Ren Takeda">Ren Takeda (Squad 4)</button>
+          <button class="link-btn" type="button" data-roblox="yuihoshi" data-name="Yui Hoshino">Yui Hoshino (Squad 11)</button>
+          <button class="link-btn" type="button" data-roblox="hamdi421" data-name="">hamdi421 (lore team)</button>
+        </div>
+      </div>
+
+      <div id="step-code" class="verify-step" hidden>
+        <div class="step-head">
+          <span class="step">Step 2 of 2</span>
+          <h2 class="serif">Check your screen in game</h2>
+        </div>
+        <p class="small soft">A 6-digit code just showed up on <strong id="code-who"></strong>. Type it in below.</p>
+        <form id="code-form" class="verify-form" novalidate>
+          <div class="field">
+            <label for="verify-code">Code from your screen</label>
+            <input id="verify-code" class="input code-input" type="text" inputmode="numeric" maxlength="6" placeholder="000000" autocomplete="one-time-code">
+          </div>
+          <p id="code-error" class="msg error" role="alert" hidden></p>
+          <button class="btn btn-red" type="submit">Verify</button>
+        </form>
+        <div class="row-between">
+          <button id="resend" class="link-btn" type="button">Send a new code</button>
+          <button id="not-me" class="link-btn" type="button">Not you?</button>
+        </div>
+        <p class="small muted">Nothing showing? Make sure you're in a Nami Region server on that account and playing that character, then send a new code.</p>
+        <p id="demo-code" class="demo-note" hidden>Demo only: the game would show <strong></strong></p>
+      </div>
+
+      <div id="step-done" class="verify-step" hidden>
+        <span class="verified">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg>
+          Verified
+        </span>
+        <div class="step-head">
+          <h2 id="done-name" class="serif"></h2>
+          <p id="done-meta" class="soft"></p>
+        </div>
+        <a class="btn btn-red" href="board.html">Open the mission board</a>
+        <button id="sign-out" class="link-btn" type="button">Sign out</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="wrap" aria-label="Artwork">
+  <div class="thumbs">
+    <button class="thumb" type="button" aria-label="Show artwork 1" aria-pressed="true"><img src="img/art-kneel.webp" alt=""></button>
+    <button class="thumb" type="button" aria-label="Show artwork 2" aria-pressed="false"><img src="img/art-moon.webp" alt=""></button>
+    <button class="thumb" type="button" aria-label="Show artwork 3" aria-pressed="false"><img src="img/art-night.webp" alt=""></button>
+    <button class="thumb" type="button" aria-label="Show artwork 4" aria-pressed="false"><img src="img/art-sun.webp" alt=""></button>
+  </div>
+</section>
+
+<section class="how wrap" aria-labelledby="how-title">
+  <h2 id="how-title" class="serif">How the board works</h2>
+  <ol>
+    <li>
+      <span class="num" aria-hidden="true">一</span>
+      <h3>Verify</h3>
+      <p>Type your lore name, then enter the code that shows up on your screen in game. That proves the character is yours.</p>
+    </li>
+    <li>
+      <span class="num" aria-hidden="true">二</span>
+      <h3>Claim</h3>
+      <p>Anyone in a squad can claim a mission for it. A squad holds one mission at a time, and each mission only takes the number of squads it asks for.</p>
+    </li>
+    <li>
+      <span class="num" aria-hidden="true">三</span>
+      <h3>Report</h3>
+      <p>Get the mission information from your assigned Chuunin and head out. Pay is handed out back in Kaigakure.</p>
+    </li>
+  </ol>
+</section>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <img src="img/logo.png" alt="Severance">
+    <span>Mission Board</span>
+  </div>
+</footer>
+
+<script src="js/api.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
