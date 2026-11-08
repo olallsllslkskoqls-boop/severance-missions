@@ -158,6 +158,31 @@ const api = (() => {
         return { ok: true, id };
       },
 
+      updateMission: async ({ token, missionId, mission }, ctx) => {
+        const who = whoIs(token, ctx.roster, ctx.loreTeam);
+        if (who.error) return who.error;
+        if (!who.me.isAdmin) return fail('Only the lore team can do that.');
+        const title = String(mission.title || '').trim();
+        if (!title) return fail('A mission needs a title.');
+        const list = await loadMissions();
+        const current = list.find((m) => m.id === missionId);
+        if (!current) return fail('That mission isn’t on the board anymore.');
+        const squadsNeeded = Math.min(18, Math.max(1, parseInt(mission.squadsNeeded, 10) || 1));
+        const taken = current.claims.length;
+        if (taken > squadsNeeded) return fail(`${taken} squads are already on it. Keep Squads needed at ${taken} or more, or clear claims first.`);
+        Object.assign(current, mission, {
+          id: current.id,
+          title,
+          host: String(mission.host || '').trim() || who.me.roblox,
+          squadsNeeded,
+          claims: current.claims,
+          postedBy: current.postedBy,
+          postedAt: current.postedAt
+        });
+        saveMissions(list);
+        return { ok: true };
+      },
+
       removeMission: async ({ token, missionId }, ctx) => {
         const who = whoIs(token, ctx.roster, ctx.loreTeam);
         if (who.error) return who.error;
@@ -241,6 +266,7 @@ const api = (() => {
     claim: (missionId) => send('claim', { missionId }),
     drop: (missionId) => send('drop', { missionId }),
     postMission: (mission) => send('postMission', { mission }),
+    updateMission: (missionId, mission) => send('updateMission', { missionId, mission }),
     removeMission: (missionId) => send('removeMission', { missionId }),
     clearClaims: (missionId) => send('clearClaims', { missionId }),
     getLoreTeam: () => send('getLoreTeam'),

@@ -494,6 +494,7 @@
     const form = $('#post-form');
     const fields = ['title', 'host', 'rank', 'faction', 'squadsNeeded', 'memberLimit', 'pay', 'bonus', 'failure', 'location', 'departure', 'timeLimit', 'summary', 'objectives', 'intel', 'optionalRequirements'];
     let confirmId = null;
+    let editing = null;
 
     const resetForm = () => {
       form.reset();
@@ -515,8 +516,44 @@
     });
 
     const renderPreview = () => {
-      $('#preview').replaceChildren(...missionDetail({ ...readForm(), claims: [] }, { preview: true }));
+      const mission = { ...readForm(), claims: editing ? editing.claims : [] };
+      $('#preview').className = `sheet-flow ${statusOf(mission, null).cls}`;
+      $('#preview').replaceChildren(...missionDetail(mission, { preview: true }));
     };
+
+    const setEditing = (mission) => {
+      editing = mission ? { id: mission.id, title: mission.title, claims: mission.claims || [] } : null;
+      $('#edit-banner').hidden = !editing;
+      $('#edit-title').textContent = editing ? editing.title : '';
+      $('#post-seal').textContent = editing ? '改' : '掲';
+      $('#post-label').textContent = editing ? 'Save changes' : 'Post to the board';
+    };
+
+    const stopEditing = () => {
+      setEditing(null);
+      resetForm();
+      renderPreview();
+      renderPosted();
+    };
+
+    const startEdit = (mission) => {
+      fields.forEach((key) => {
+        const value = key === 'objectives' ? (mission.objectives || []).join('\n') : mission[key];
+        form.elements[key].value = value == null ? '' : String(value);
+      });
+      setEditing(mission);
+      confirmId = null;
+      showMsg($('#post-msg'), '');
+      renderPreview();
+      renderPosted();
+      form.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' });
+      $('#f-title').focus({ preventScroll: true });
+    };
+
+    $('#cancel-edit').addEventListener('click', () => {
+      stopEditing();
+      showMsg($('#post-msg'), '');
+    });
 
     form.addEventListener('input', () => {
       renderPreview();
@@ -537,10 +574,9 @@
 
     $('#clear').addEventListener('click', () => {
       $('#paste').value = '';
-      resetForm();
       showMsg($('#paste-msg'), '');
       showMsg($('#post-msg'), '');
-      renderPreview();
+      stopEditing();
     });
 
     form.addEventListener('submit', async (e) => {
@@ -551,16 +587,15 @@
         $('#f-title').focus();
         return;
       }
-      const res = await busy(e.submitter, () => api.postMission(data));
+      const wasEditing = editing;
+      const res = await busy(e.submitter, () => (wasEditing ? api.updateMission(wasEditing.id, data) : api.postMission(data)));
       if (!res.ok) {
         showMsg($('#post-msg'), res.error, 'error');
         return;
       }
-      resetForm();
       $('#paste').value = '';
-      renderPreview();
-      showMsg($('#post-msg'), `Posted “${data.title}”. It’s on the board now.`, 'ok');
-      renderPosted();
+      stopEditing();
+      showMsg($('#post-msg'), wasEditing ? `Saved changes to “${data.title}”.` : `Posted “${data.title}”. It’s on the board now.`, 'ok');
     });
 
     const renderPosted = async () => {
@@ -577,13 +612,21 @@
       rows.replaceChildren(...res.missions.map((m) => {
         const status = statusOf(m, null);
         const confirming = confirmId === m.id;
-        return el('div', { class: 'table-row' },
+        const isEditing = !!editing && editing.id === m.id;
+        return el('div', { class: `table-row${isEditing ? ' is-editing' : ''}` },
           el('span', { class: 'row-title', text: m.title }),
           el('span', { text: m.host || 'Not set' }),
           el('span', { class: 'strong', text: m.rank }),
           el('span', { text: `${m.claims.length} of ${m.squadsNeeded}` }),
           el('span', { class: `status ${status.cls}`, text: status.text }),
           el('span', { class: 'actions' },
+            el('button', {
+              class: 'btn btn-ink btn-small',
+              type: 'button',
+              disabled: isEditing,
+              text: isEditing ? 'Editing' : 'Edit',
+              onClick: () => startEdit(m)
+            }),
             el('button', {
               class: 'btn btn-ink btn-small',
               type: 'button',
@@ -606,6 +649,10 @@
                 }
                 confirmId = null;
                 await busy(e.currentTarget, () => api.removeMission(m.id));
+                if (isEditing) {
+                  stopEditing();
+                  return;
+                }
                 renderPosted();
               }
             })));

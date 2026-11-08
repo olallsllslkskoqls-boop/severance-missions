@@ -310,8 +310,11 @@ textarea.input { padding: 10px 12px; border: 1.5px solid rgba(29,22,18,0.55); bo
 .sheet-compact .sheet-section p, .sheet-compact .objectives { font-size: 15px; }
 .ledger { padding: 8px 6px; }
 .table-wrap { overflow-x: auto; }
-.table { min-width: 860px; }
-.table-row { display: grid; grid-template-columns: 2fr 1.1fr 0.6fr 0.8fr 1.1fr 1.8fr; gap: 12px; align-items: center; padding: 12px 20px; border-bottom: 1px solid rgba(42,29,20,0.3); color: var(--ink); }
+.table { min-width: 960px; }
+.table-row { display: grid; grid-template-columns: 2fr 1.1fr 0.6fr 0.8fr 1.1fr 2.5fr; gap: 12px; align-items: center; padding: 12px 20px; border-bottom: 1px solid rgba(42,29,20,0.3); color: var(--ink); }
+.table-row.is-editing { background: rgba(39,72,107,0.12); }
+.edit-banner { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px 16px; padding: 12px 14px; border: 2px dashed var(--indigo); background: rgba(39,72,107,0.08); font-family: var(--sans); font-size: 14px; color: var(--ink); }
+.edit-banner strong { font-family: var(--serif); font-weight: 800; }
 .table-row:last-child { border-bottom: 0; }
 .table-head { font-family: var(--sans); font-size: 12px; font-weight: 700; letter-spacing: 0.1em; color: var(--ink-muted); border-bottom: 2px solid var(--ink-soft); }
 .table-row .right { text-align: right; }
